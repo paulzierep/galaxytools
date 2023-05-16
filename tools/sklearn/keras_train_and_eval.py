@@ -50,20 +50,18 @@ ALLOWED_CALLBACKS = (
 def _eval_swap_params(params_builder):
     swap_params = {}
 
-    for p in params_builder["param_set"]:
-        swap_value = p["sp_value"].strip()
-        if swap_value == "":
+    for p in params_builder['param_set']:
+        swap_value = p['sp_value'].strip()
+        if swap_value == '':
             continue
 
-        param_name = p["sp_name"]
+        param_name = p['sp_name']
         if param_name.lower().endswith(NON_SEARCHABLE):
-            warnings.warn(
-                "Warning: `%s` is not eligible for search and was "
-                "omitted!" % param_name
-            )
+            warnings.warn("Warning: `%s` is not eligible for search and was "
+                          "omitted!" % param_name)
             continue
 
-        if not swap_value.startswith(":"):
+        if not swap_value.startswith(':'):
             safe_eval = SafeEval(load_scipy=True, load_numpy=True)
             ev = safe_eval(swap_value)
         else:
@@ -90,15 +88,16 @@ def train_test_split_none(*arrays, **kwargs):
         else:
             new_arrays.append(arr)
 
-    if kwargs["shuffle"] == "None":
-        kwargs["shuffle"] = None
+    if kwargs['shuffle'] == 'None':
+        kwargs['shuffle'] = None
 
-    group_names = kwargs.pop("group_names", None)
+    group_names = kwargs.pop('group_names', None)
 
     if group_names is not None and group_names.strip():
-        group_names = [name.strip() for name in group_names.split(",")]
+        group_names = [name.strip() for name in
+                       group_names.split(',')]
         new_arrays = indexable(*new_arrays)
-        groups = kwargs["labels"]
+        groups = kwargs['labels']
         n_samples = new_arrays[0].shape[0]
         index_arr = np.arange(n_samples)
         test = index_arr[np.isin(groups, group_names)]
@@ -239,9 +238,9 @@ def main(
     fasta_path : str
         File path to dataset containing fasta file.
     """
-    warnings.simplefilter("ignore")
+    warnings.simplefilter('ignore')
 
-    with open(inputs, "r") as param_handler:
+    with open(inputs, 'r') as param_handler:
         params = json.load(param_handler)
 
     #  load estimator
@@ -250,7 +249,7 @@ def main(
     estimator = clean_params(estimator)
 
     # swap hyperparameter
-    swapping = params["experiment_schemes"]["hyperparams_swapping"]
+    swapping = params['experiment_schemes']['hyperparams_swapping']
     swap_params = _eval_swap_params(swapping)
     estimator.set_params(**swap_params)
 
@@ -259,41 +258,38 @@ def main(
     # store read dataframe object
     loaded_df = {}
 
-    input_type = params["input_options"]["selected_input"]
+    input_type = params['input_options']['selected_input']
     # tabular input
-    if input_type == "tabular":
-        header = "infer" if params["input_options"]["header1"] else None
-        column_option = params["input_options"]["column_selector_options_1"][
-            "selected_column_selector_option"
-        ]
-        if column_option in [
-            "by_index_number",
-            "all_but_by_index_number",
-            "by_header_name",
-            "all_but_by_header_name",
-        ]:
-            c = params["input_options"]["column_selector_options_1"]["col1"]
+    if input_type == 'tabular':
+        header = 'infer' if params['input_options']['header1'] else None
+        column_option = (params['input_options']['column_selector_options_1']
+                         ['selected_column_selector_option'])
+        if column_option in ['by_index_number', 'all_but_by_index_number',
+                             'by_header_name', 'all_but_by_header_name']:
+            c = params['input_options']['column_selector_options_1']['col1']
         else:
             c = None
 
         df_key = infile1 + repr(header)
-        df = pd.read_csv(infile1, sep="\t", header=header, parse_dates=True)
+        df = pd.read_csv(infile1, sep='\t', header=header,
+                         parse_dates=True)
         loaded_df[df_key] = df
 
         X = read_columns(df, c=c, c_option=column_option).astype(float)
     # sparse input
-    elif input_type == "sparse":
-        X = mmread(open(infile1, "r"))
+    elif input_type == 'sparse':
+        X = mmread(open(infile1, 'r'))
 
     # fasta_file input
-    elif input_type == "seq_fasta":
-        pyfaidx = get_module("pyfaidx")
+    elif input_type == 'seq_fasta':
+        pyfaidx = get_module('pyfaidx')
         sequences = pyfaidx.Fasta(fasta_path)
         n_seqs = len(sequences.keys())
         X = np.arange(n_seqs)[:, np.newaxis]
         for param in estimator_params.keys():
-            if param.endswith("fasta_path"):
-                estimator.set_params(**{param: fasta_path})
+            if param.endswith('fasta_path'):
+                estimator.set_params(
+                    **{param: fasta_path})
                 break
         else:
             raise ValueError(
@@ -302,31 +298,25 @@ def main(
                 "KerasGBatchClassifier with "
                 "FastaDNABatchGenerator/FastaProteinBatchGenerator "
                 "or having GenomeOneHotEncoder/ProteinOneHotEncoder "
-                "in pipeline!"
-            )
+                "in pipeline!")
 
-    elif input_type == "refseq_and_interval":
+    elif input_type == 'refseq_and_interval':
         path_params = {
-            "data_batch_generator__ref_genome_path": ref_seq,
-            "data_batch_generator__intervals_path": intervals,
-            "data_batch_generator__target_path": targets,
+            'data_batch_generator__ref_genome_path': ref_seq,
+            'data_batch_generator__intervals_path': intervals,
+            'data_batch_generator__target_path': targets
         }
         estimator.set_params(**path_params)
         n_intervals = sum(1 for line in open(intervals))
         X = np.arange(n_intervals)[:, np.newaxis]
 
     # Get target y
-    header = "infer" if params["input_options"]["header2"] else None
-    column_option = params["input_options"]["column_selector_options_2"][
-        "selected_column_selector_option2"
-    ]
-    if column_option in [
-        "by_index_number",
-        "all_but_by_index_number",
-        "by_header_name",
-        "all_but_by_header_name",
-    ]:
-        c = params["input_options"]["column_selector_options_2"]["col2"]
+    header = 'infer' if params['input_options']['header2'] else None
+    column_option = (params['input_options']['column_selector_options_2']
+                     ['selected_column_selector_option2'])
+    if column_option in ['by_index_number', 'all_but_by_index_number',
+                         'by_header_name', 'all_but_by_header_name']:
+        c = params['input_options']['column_selector_options_2']['col2']
     else:
         c = None
 
@@ -334,7 +324,8 @@ def main(
     if df_key in loaded_df:
         infile2 = loaded_df[df_key]
     else:
-        infile2 = pd.read_csv(infile2, sep="\t", header=header, parse_dates=True)
+        infile2 = pd.read_csv(infile2, sep='\t',
+                              header=header, parse_dates=True)
         loaded_df[df_key] = infile2
 
     y = read_columns(
@@ -347,28 +338,24 @@ def main(
     )
     if len(y.shape) == 2 and y.shape[1] == 1:
         y = y.ravel()
-    if input_type == "refseq_and_interval":
-        estimator.set_params(data_batch_generator__features=y.ravel().tolist())
+    if input_type == 'refseq_and_interval':
+        estimator.set_params(
+            data_batch_generator__features=y.ravel().tolist())
         y = None
     # end y
 
     # load groups
     if groups:
-        groups_selector = (
-            params["experiment_schemes"]["test_split"]["split_algos"]
-        ).pop("groups_selector")
+        groups_selector = (params['experiment_schemes']['test_split']
+                                 ['split_algos']).pop('groups_selector')
 
-        header = "infer" if groups_selector["header_g"] else None
-        column_option = groups_selector["column_selector_options_g"][
-            "selected_column_selector_option_g"
-        ]
-        if column_option in [
-            "by_index_number",
-            "all_but_by_index_number",
-            "by_header_name",
-            "all_but_by_header_name",
-        ]:
-            c = groups_selector["column_selector_options_g"]["col_g"]
+        header = 'infer' if groups_selector['header_g'] else None
+        column_option = \
+            (groups_selector['column_selector_options_g']
+                            ['selected_column_selector_option_g'])
+        if column_option in ['by_index_number', 'all_but_by_index_number',
+                             'by_header_name', 'all_but_by_header_name']:
+            c = groups_selector['column_selector_options_g']['col_g']
         else:
             c = None
 
@@ -380,7 +367,7 @@ def main(
             groups,
             c=c,
             c_option=column_option,
-            sep="\t",
+            sep='\t',
             header=header,
             parse_dates=True,
         )
@@ -392,7 +379,7 @@ def main(
     # cache iraps_core fits could increase search speed significantly
     memory = joblib.Memory(location=CACHE_DIR, verbose=0)
     main_est = get_main_estimator(estimator)
-    if main_est.__class__.__name__ == "IRAPSClassifier":
+    if main_est.__class__.__name__ == 'IRAPSClassifier':
         main_est.set_params(memory=memory)
 
     # handle scorer, convert to scorer dict
@@ -403,38 +390,37 @@ def main(
     scorer = _check_multimetric_scoring(estimator, scoring=scorer)
 
     # handle test (first) split
-    test_split_options = params["experiment_schemes"]["test_split"]["split_algos"]
+    test_split_options = (params['experiment_schemes']
+                                ['test_split']['split_algos'])
 
-    if test_split_options["shuffle"] == "group":
-        test_split_options["labels"] = groups
-    if test_split_options["shuffle"] == "stratified":
+    if test_split_options['shuffle'] == 'group':
+        test_split_options['labels'] = groups
+    if test_split_options['shuffle'] == 'stratified':
         if y is not None:
-            test_split_options["labels"] = y
+            test_split_options['labels'] = y
         else:
-            raise ValueError(
-                "Stratified shuffle split is not " "applicable on empty target values!"
-            )
+            raise ValueError("Stratified shuffle split is not "
+                             "applicable on empty target values!")
 
     X_train, X_test, y_train, y_test, groups_train, groups_test = train_test_split_none(
         X, y, groups, **test_split_options
     )
 
-    exp_scheme = params["experiment_schemes"]["selected_exp_scheme"]
+    exp_scheme = params['experiment_schemes']['selected_exp_scheme']
 
     # handle validation (second) split
-    if exp_scheme == "train_val_test":
-        val_split_options = params["experiment_schemes"]["val_split"]["split_algos"]
+    if exp_scheme == 'train_val_test':
+        val_split_options = (params['experiment_schemes']
+                                   ['val_split']['split_algos'])
 
-        if val_split_options["shuffle"] == "group":
-            val_split_options["labels"] = groups_train
-        if val_split_options["shuffle"] == "stratified":
+        if val_split_options['shuffle'] == 'group':
+            val_split_options['labels'] = groups_train
+        if val_split_options['shuffle'] == 'stratified':
             if y_train is not None:
-                val_split_options["labels"] = y_train
+                val_split_options['labels'] = y_train
             else:
-                raise ValueError(
-                    "Stratified shuffle split is not "
-                    "applicable on empty target values!"
-                )
+                raise ValueError("Stratified shuffle split is not "
+                                 "applicable on empty target values!")
 
         (
             X_train,
@@ -450,7 +436,8 @@ def main(
         if exp_scheme == "train_val_test":
             estimator.fit(X_train, y_train, validation_data=(X_val, y_val))
         else:
-            estimator.fit(X_train, y_train, validation_data=(X_test, y_test))
+            estimator.fit(X_train, y_train,
+                          validation_data=(X_test, y_test))
     else:
         estimator.fit(X_train, y_train)
 
@@ -496,14 +483,11 @@ def main(
     # handle output
     if outfile_y_true:
         try:
-            pd.DataFrame(y_true).to_csv(outfile_y_true, sep="\t", index=False)
+            pd.DataFrame(y_true).to_csv(outfile_y_true, sep='\t',
+                                        index=False)
             pd.DataFrame(predictions).astype(np.float32).to_csv(
-                outfile_y_preds,
-                sep="\t",
-                index=False,
-                float_format="%g",
-                chunksize=10000,
-            )
+                outfile_y_preds, sep='\t', index=False,
+                float_format='%g', chunksize=10000)
         except Exception as e:
             print("Error in saving predictions: %s" % e)
     # handle output
@@ -511,7 +495,8 @@ def main(
         scores[name] = [score]
     df = pd.DataFrame(scores)
     df = df[sorted(df.columns)]
-    df.to_csv(path_or_buf=outfile_result, sep="\t", header=True, index=False)
+    df.to_csv(path_or_buf=outfile_result, sep='\t',
+              header=True, index=False)
 
     memory.clear(warn=False)
 
@@ -519,7 +504,7 @@ def main(
         dump_model_to_h5(estimator, outfile_object)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     aparser = argparse.ArgumentParser()
     aparser.add_argument("-i", "--inputs", dest="inputs", required=True)
     aparser.add_argument("-e", "--estimator", dest="infile_estimator")
