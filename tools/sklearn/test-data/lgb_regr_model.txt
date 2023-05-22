@@ -447,7 +447,7 @@ shrinkage=0.02
 
 
 Tree=23
-num_leaves=4
+num_leaves=5
 num_cat=0
 split_feature=6 4 7
 split_gain=9019.13 1566.14 1345.24
@@ -713,7 +713,7 @@ shrinkage=0.02
 
 
 Tree=37
-num_leaves=4
+num_leaves=5
 num_cat=0
 split_feature=4 4 8
 split_gain=5309.24 989.543 704.129
@@ -960,7 +960,7 @@ shrinkage=0.02
 
 
 Tree=50
-num_leaves=4
+num_leaves=5
 num_cat=0
 split_feature=4 4 2
 split_gain=3265.81 789.367 341.976
@@ -1492,7 +1492,7 @@ shrinkage=0.02
 
 
 Tree=78
-num_leaves=4
+num_leaves=5
 num_cat=0
 split_feature=4 8 4
 split_gain=1173.82 392.107 99.6687
@@ -1587,7 +1587,7 @@ shrinkage=0.02
 
 
 Tree=83
-num_leaves=4
+num_leaves=5
 num_cat=0
 split_feature=4 4 7
 split_gain=984.98 348.686 167.483
@@ -1701,7 +1701,7 @@ shrinkage=0.02
 
 
 Tree=89
-num_leaves=4
+num_leaves=5
 num_cat=0
 split_feature=6 7 4
 split_gain=783.48 275.126 76.5035
@@ -1929,7 +1929,7 @@ parameters:
 [device_type: cpu]
 [data: ]
 [valid: ]
-[num_iterations: 100]
+[num_iterations: 10000]
 [learning_rate: 0.02]
 [num_leaves: 4]
 [num_threads: 1]
