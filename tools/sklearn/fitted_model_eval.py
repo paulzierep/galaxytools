@@ -3,7 +3,7 @@ import json
 import warnings
 
 from galaxy_ml.model_persist import load_model_from_h5
-from galaxy_ml.utils import (clean_params, get_scoring, read_columns)
+from galaxy_ml.utils import clean_params, get_scoring, read_columns
 
 import pandas as pd
 from galaxy_ml.model_persist import load_model_from_h5
@@ -14,7 +14,7 @@ from sklearn.model_selection._validation import _score
 
 
 def _get_X_y(params, infile1, infile2):
-    """ read from inputs and output X and y
+    """read from inputs and output X and y
 
     Parameters
     ----------
@@ -29,35 +29,44 @@ def _get_X_y(params, infile1, infile2):
     # store read dataframe object
     loaded_df = {}
 
-    input_type = params['input_options']['selected_input']
+    input_type = params["input_options"]["selected_input"]
     # tabular input
-    if input_type == 'tabular':
-        header = 'infer' if params['input_options']['header1'] else None
-        column_option = (params['input_options']['column_selector_options_1']
-                         ['selected_column_selector_option'])
-        if column_option in ['by_index_number', 'all_but_by_index_number',
-                             'by_header_name', 'all_but_by_header_name']:
-            c = params['input_options']['column_selector_options_1']['col1']
+    if input_type == "tabular":
+        header = "infer" if params["input_options"]["header1"] else None
+        column_option = params["input_options"]["column_selector_options_1"][
+            "selected_column_selector_option"
+        ]
+        if column_option in [
+            "by_index_number",
+            "all_but_by_index_number",
+            "by_header_name",
+            "all_but_by_header_name",
+        ]:
+            c = params["input_options"]["column_selector_options_1"]["col1"]
         else:
             c = None
 
         df_key = infile1 + repr(header)
-        df = pd.read_csv(infile1, sep='\t', header=header,
-                         parse_dates=True)
+        df = pd.read_csv(infile1, sep="\t", header=header, parse_dates=True)
         loaded_df[df_key] = df
 
         X = read_columns(df, c=c, c_option=column_option).astype(float)
     # sparse input
-    elif input_type == 'sparse':
-        X = mmread(open(infile1, 'r'))
+    elif input_type == "sparse":
+        X = mmread(open(infile1, "r"))
 
     # Get target y
-    header = 'infer' if params['input_options']['header2'] else None
-    column_option = (params['input_options']['column_selector_options_2']
-                     ['selected_column_selector_option2'])
-    if column_option in ['by_index_number', 'all_but_by_index_number',
-                         'by_header_name', 'all_but_by_header_name']:
-        c = params['input_options']['column_selector_options_2']['col2']
+    header = "infer" if params["input_options"]["header2"] else None
+    column_option = params["input_options"]["column_selector_options_2"][
+        "selected_column_selector_option2"
+    ]
+    if column_option in [
+        "by_index_number",
+        "all_but_by_index_number",
+        "by_header_name",
+        "all_but_by_header_name",
+    ]:
+        c = params["input_options"]["column_selector_options_2"]["col2"]
     else:
         c = None
 
@@ -65,8 +74,7 @@ def _get_X_y(params, infile1, infile2):
     if df_key in loaded_df:
         infile2 = loaded_df[df_key]
     else:
-        infile2 = pd.read_csv(infile2, sep='\t',
-                              header=header, parse_dates=True)
+        infile2 = pd.read_csv(infile2, sep="\t", header=header, parse_dates=True)
         loaded_df[df_key] = infile2
 
     y = read_columns(
@@ -102,9 +110,9 @@ def main(inputs, infile_estimator, outfile_eval, infile1=None, infile2=None):
     infile2 : str
         File path to dataset containing target values
     """
-    warnings.filterwarnings('ignore')
+    warnings.filterwarnings("ignore")
 
-    with open(inputs, 'r') as param_handler:
+    with open(inputs, "r") as param_handler:
         params = json.load(param_handler)
 
     X_test, y_test = _get_X_y(params, infile1, infile2)
@@ -130,11 +138,10 @@ def main(inputs, infile_estimator, outfile_eval, infile1=None, infile2=None):
         scores[name] = [score]
     df = pd.DataFrame(scores)
     df = df[sorted(df.columns)]
-    df.to_csv(path_or_buf=outfile_eval, sep='\t',
-              header=True, index=False)
+    df.to_csv(path_or_buf=outfile_eval, sep="\t", header=True, index=False)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     aparser = argparse.ArgumentParser()
     aparser.add_argument("-i", "--inputs", dest="inputs", required=True)
     aparser.add_argument("-e", "--infile_estimator", dest="infile_estimator")
@@ -148,5 +155,5 @@ if __name__ == '__main__':
         args.infile_estimator,
         args.outfile_eval,
         infile1=args.infile1,
-        infile2=args.infile2
+        infile2=args.infile2,
     )
