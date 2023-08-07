@@ -18,7 +18,6 @@ from galaxy_ml.utils import (
     try_get_attr
 )
 from scipy.io import mmread
-
 from sklearn import pipeline
 from sklearn.model_selection import _search, _validation
 from sklearn.model_selection._validation import _score
@@ -106,7 +105,7 @@ def train_test_split_none(*arrays, **kwargs):
         rval = train_test_split(*new_arrays, **kwargs)
 
     for pos in nones:
-        rval[pos * 2 : 2] = [None, None]
+        rval[pos * 2: 2] = [None, None]
 
     return rval
 
