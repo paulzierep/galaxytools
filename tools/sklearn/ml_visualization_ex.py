@@ -3,16 +3,10 @@ import json
 import os
 import warnings
 
-from galaxy_ml.model_persist import load_model_from_h5
-from galaxy_ml.utils import SafeEval, read_columns
-
 import matplotlib
 import matplotlib.pyplot as plt
-
 import numpy as np
-
 import pandas as pd
-
 import plotly
 import plotly.graph_objs as go
 from galaxy_ml.model_persist import load_model_from_h5
@@ -31,6 +25,10 @@ from tensorflow.keras.utils import plot_model
 from tensorflow.keras.models import model_from_json
 from tensorflow.keras.utils import plot_model
 
+from sklearn.feature_selection._base import SelectorMixin
+from sklearn.metrics import (auc, average_precision_score,
+                             precision_recall_curve, roc_curve)
+from sklearn.pipeline import Pipeline
 
 safe_eval = SafeEval()
 
