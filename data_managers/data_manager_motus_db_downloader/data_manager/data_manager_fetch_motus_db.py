@@ -9,7 +9,7 @@ import sys
 import tarfile
 from datetime import datetime
 
-import wget
+import requests
 
 version_mapping = {
     "3.1.0": "https://zenodo.org/records/7778108/files/db_mOTU_v3.1.0.tar.gz",
@@ -28,11 +28,15 @@ def download_untar_store(url, tmp_path, dest_path):
 
     os.makedirs(tmp_path, exist_ok=True)
 
-    # download data
-    filename = wget.download(url, out=tmp_path)
-    tarfile_path = os.path.join(tmp_path, filename)
-    tar = tarfile.open(tarfile_path)
-    tar.extractall(extract_path)
+   # download data
+    response = requests.get(url, stream=True)
+    tarfile_path = os.path.join(tmp_path, os.path.basename(url))
+    with open(tarfile_path, 'wb') as f:
+        shutil.copyfileobj(response.raw, f)
+
+    # Extract the tar.gz file
+    with tarfile.open(tarfile_path, "r:gz") as tar:
+        tar.extractall(extract_path)
 
     if len(list(os.listdir(extract_path))) > 1:
         print("More then one folder in zipped file, aborting !")
@@ -81,12 +85,14 @@ def main():
     if args.test:  # the test only checks that the pharokka download script is available
 
         # check if link is there
-        command_args = ["wget", "--spider", url]
-        proc = subprocess.Popen(args=command_args, shell=False)
-        return_code = proc.wait()
-        if return_code:
-            print("Error downloading motus database.", file=sys.stderr)
-            sys.exit(return_code)
+        try:
+            response = requests.head(url)
+            if response.status_code != 200:
+                print("Error downloading motus database.", file=sys.stderr)
+                sys.exit(1)
+        except requests.RequestException as e:
+            print(f"Error downloading motus database: {e}", file=sys.stderr)
+            sys.exit(1)
 
         # copy the test DB
         # TODO ones available: https://github.com/motu-tool/mOTUs/issues/121

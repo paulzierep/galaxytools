@@ -17,11 +17,9 @@
             <requirement type="package" version="3.2">python-wget</requirement>
         </requirements>
     </xml>
-    <xml name="citations">
+    <xml name="citation">
         <citations>
-            <citations>
-                <citation type="doi">10.1186/s40168-022-01410-z</citation>
-            </citations>
+            <citation type="doi">10.1186/s40168-022-01410-z</citation>
         </citations>
     </xml>
     <xml name="creator">
