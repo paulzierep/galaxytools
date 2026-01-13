@@ -52,7 +52,7 @@
                 <has_text text="-a 0.2"/>
             </assert_command>
          </test>
-        <!-- Since this tool need his ref data to work there is no way to test this tool really because of this there is only this test to see of the tool is starting or not 
+        <!-- Since this tool need his ref data to work there is no way to test this tool really because of this there is only this test to see of the tool is starting or not  -->
         <test expect_num_outputs="1">
             <param name="bins_dir" value="all_contig.fasta.gz" ftype="fasta.gz"/>
 	    <param name="ass2ref" value="0.2"/>
@@ -86,7 +86,6 @@
                 <has_text text="-a 0.0"/>
             </assert_command>
         </test>
-    -->
     </tests>
     <help>
         <![CDATA[
