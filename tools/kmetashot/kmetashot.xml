@@ -22,7 +22,8 @@
             -b bins
             -o output
             -r '$reference.fields.path'
-            -p "\${GALAXY_SLOTS:-10}"
+            ##-p "\${GALAXY_SLOTS:-10}"
+            -p 1
             -a ${ass2ref}
 
         ]]>
