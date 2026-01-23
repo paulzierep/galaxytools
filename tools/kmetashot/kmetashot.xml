@@ -29,7 +29,8 @@
         ]]>
     </command>
     <inputs>
-        <param argument="--bins_dir" type="data" format="fasta,fasta.gz" label="Bin(s)/MAG(s) fasta files"/>
+        <param name="bins_dir" type="data_collection" collection_type="list" format="fasta,fasta.gz" label="Bin(s)/MAG(s) fasta files"/>
+ 
         <param argument="--reference" type="select" label="Select a reference database.">
             <options from_data_table="kmetashot">
                 <filter type="sort_by" column="2"/>
