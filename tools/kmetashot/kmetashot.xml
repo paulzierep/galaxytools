@@ -14,9 +14,11 @@
 
             mkdir -p output bins &&
 
-            #for $file in $bins_dir:
-                ln -s '$file' 'bins/$file.element_identifier' &&
-            #end for
+            for file in $bins_dir; do
+                base=$(basename "$file")
+                # Preserve original extension (.fasta or .fasta.gz)
+                ln -s "$file" "bins/${base}"
+            done
 
             ls -la bins &&
 
