@@ -15,7 +15,7 @@
             mkdir -p output bins &&
 
             #for $file in $bins_dir:
-                ln -s '$file' 'bins/$file.element_identifier' + '.' + '$file.ext' &&
+                ln -s '$file' 'bins/$file.element_identifier.$file.extension' &&
             #end for
 
             ls -la bins &&
