@@ -18,6 +18,8 @@
                 ln -s '$file' 'bins/$file.element_identifier' &&
             #end for
 
+            ls -la bins &&
+
             kMetaShot_classifier_NV.py 
             -b bins
             -o output
